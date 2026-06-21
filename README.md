@@ -1,33 +1,53 @@
-# Ticker Tape MMI Git Scraper
+# Oriz MMI — Tickertape Market Mood Index Mirror
 
-![Ticker Tape MMI Logo](logo.png)
+![Oriz MMI](logo.png)
 
-A daily/hourly scraper for the Ticker Tape Market Mood Index (MMI).
-This repository automatically fetches the MMI value, stores the history, and generates a chart.
+A Cloudflare Workers API that mirrors [Tickertape's Market Mood Index](https://www.tickertape.in/market-mood-index) (MMI) — a 0-100 sentiment gauge for the Indian equity market.
 
-## Latest MMI Value
+- **Live:** <https://mmi.api.oriz.in>
+- **Source:** Tickertape's public MMI endpoint, cached in Cloudflare KV.
+- **Stack:** Hono on Cloudflare Workers + KV.
 
-**55.85** - **Greed**
-<small>Last Updated: 2026-06-16 04:03 UTC</small>
+## Endpoints
 
-## MMI Trend (Last 30 Days)
+| Method | Path | Cache | Description |
+| --- | --- | --- | --- |
+| GET | `/` | — | Service info + endpoint list |
+| GET | `/current` | 1h | Current MMI value + zone |
+| GET | `/history?days=N` | 24h | Last `N` days (1-365, default 30) |
+| GET | `/zones` | static | Reference for the 4 zone bands |
 
-![MMI Chart](mmi_chart.png)
+CORS is open (`*`). All responses are JSON.
 
-## Data
+### Example
 
-The historical data is available in [data/history.json](data/history.json).
+```bash
+$ curl https://mmi.api.oriz.in/current
+{ "value": 55.85, "zone": "greed", "fetchedAt": "2026-06-21T12:00:00.000Z" }
+```
 
-### Zones Reference
-- **Extreme Fear:** < 30
-- **Fear:** 30 - 50
-- **Greed:** 50 - 70
-- **Extreme Greed:** > 70
+### Zone reference
 
-## API Access
+| Zone | Range |
+| --- | --- |
+| Extreme Fear | `< 30` |
+| Fear | `30 - 50` |
+| Greed | `50 - 70` |
+| Extreme Greed | `> 70` |
 
-You can access the historical data via GitHub Pages:
-[https://chirag127.github.io/tickertape-mmi/data/history.json](https://chirag127.github.io/tickertape-mmi/data/history.json)
+## Develop
 
-Raw JSON File:
-[https://raw.githubusercontent.com/chirag127/tickertape-mmi/main/data/history.json](https://raw.githubusercontent.com/chirag127/tickertape-mmi/main/data/history.json)
+```bash
+pnpm install
+pnpm dev        # wrangler dev
+pnpm test       # vitest (Workers pool)
+pnpm typecheck
+```
+
+## Deploy
+
+CI deploys on push to `main` via `.github/workflows/deploy.yml`. Required repo secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`. After the first deploy, create the KV namespace (`wrangler kv namespace create CACHE`) and paste the id into `wrangler.toml`.
+
+## License
+
+MIT — see [LICENSE](./LICENSE). Historical data lives in [`data/`](./data) (preserved from the prior scraper).

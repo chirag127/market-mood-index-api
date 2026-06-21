@@ -1,6 +1,23 @@
 {
+  "name": "oriz-mmi-tickertape-mmi-api",
+  "version": "0.1.0",
+  "description": "Cloudflare Workers API mirroring Tickertape's Market Mood Index.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {
-    "firebase": "^12.14.0",
-    "recharts": "^3.8.1"
+    "hono": "^4.6.0"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.5.0",
+    "@cloudflare/workers-types": "^4.20240925.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0",
+    "wrangler": "^3.78.0"
   }
 }
