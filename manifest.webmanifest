@@ -1,0 +1,9 @@
+{
+  "name": "Oriz Market Mood Index (MMI) API",
+  "short_name": "Market Mood Index (MMI)",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b1020",
+  "theme_color": "#0b1020",
+  "icons": []
+}

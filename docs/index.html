@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Oriz Market Mood Index (MMI) API</title>
+<meta name="description" content="Indian market mood index — daily score + zone (fear / neutral / greed)." />
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="theme-color" content="#0b1020" />
+<style>
+  :root { --bg:#0b1020; --fg:#e6e9f2; --muted:#9aa3b2; --accent:#7cd1ff; --card:#141a2e; --border:#1d2440; --code:#0a0f1f; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:var(--bg); color:var(--fg); line-height:1.55; }
+  header.brand { max-width: 880px; margin: 0 auto; padding: 1.5rem 1.25rem 0; display:flex; align-items:center; gap:.6rem; }
+  header.brand a { color: var(--fg); text-decoration: none; font-weight: 600; font-size:.95rem; letter-spacing:.02em; }
+  header.brand .dot { width:8px; height:8px; border-radius:50%; background: var(--accent); display:inline-block; }
+  main { max-width: 880px; margin: 0 auto; padding: 1.5rem 1.25rem 2rem; }
+  h1 { font-size: 2rem; margin: 0 0 .25rem; }
+  .lede { color: var(--muted); margin: 0 0 2rem; }
+  .card { background: var(--card); border-radius: 12px; padding: 1.25rem 1.5rem; margin: 1rem 0; border: 1px solid var(--border); }
+  .card h2 { margin: 0 0 .75rem; font-size: 1.1rem; }
+  code, pre { background: var(--code); padding:.15rem .4rem; border-radius:4px; font-size:.9em; font-family: ui-monospace, "JetBrains Mono", "SF Mono", monospace; }
+  pre { padding: .9rem 1.1rem; overflow-x:auto; }
+  a { color: var(--accent); }
+  .endpoint { display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
+  .endpoint code { flex: 1 1 auto; min-width: 0; word-break: break-all; }
+  button.copy { background: var(--accent); color: #08111e; border: none; border-radius: 6px; padding: .45rem .8rem; font-size:.85rem; font-weight: 600; cursor: pointer; font-family: inherit; }
+  button.copy:hover { filter: brightness(1.1); }
+  button.copy.ok { background: #6ee7a7; }
+  table { width:100%; border-collapse: collapse; font-size:.9rem; }
+  th, td { text-align:left; padding:.4rem .6rem; border-bottom:1px solid var(--border); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; }
+  .meta { color: var(--muted); font-size:.85rem; }
+  .badge { display:inline-block; padding:.1rem .5rem; border-radius:999px; background:#1d2440; color:var(--muted); font-size:.75rem; margin-left:.5rem; }
+  footer.legal { max-width: 880px; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; color: var(--muted); font-size:.85rem; border-top: 1px solid var(--border); }
+  footer.legal nav { display:flex; flex-wrap:wrap; gap: 1rem; margin: .5rem 0; }
+  footer.legal nav a { color: var(--fg); text-decoration: none; }
+  footer.legal nav a:hover { color: var(--accent); }
+  footer.legal .row2 { margin-top:.5rem; }
+  @media (max-width: 600px) {
+    main { padding: 1rem; }
+    h1 { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+<header class="brand">
+  <span class="dot"></span>
+  <a href="https://oriz.in/">Oriz</a>
+  <span style="color:var(--muted)">/</span>
+  <a href="https://oriz.in/apis">APIs</a>
+</header>
+
+<main>
+  <h1>Oriz Market Mood Index (MMI) API</h1>
+  <p class="lede">Indian market mood index — daily score + zone (fear / neutral / greed).</p>
+
+  <div class="card">
+    <h2>Endpoint</h2>
+    <div class="endpoint">
+      <code id="fetchUrl">https://mmi.api.oriz.in/data/latest.json</code>
+      <button class="copy" data-copy="https://mmi.api.oriz.in/data/latest.json">Copy</button>
+    </div>
+    <p class="meta" style="margin-top:.75rem">Refreshed hourly during market hours. · No auth · CORS open · MIT.</p>
+  </div>
+
+  <div class="card">
+    <h2>Live preview <span class="badge" id="liveBadge">loading…</span></h2>
+    <div id="preview" class="meta">Fetching <code>/data/latest.json</code>…</div>
+  </div>
+
+  <div class="card">
+    <h2>Schema (current shape)</h2>
+    <pre id="schema">loading…</pre>
+  </div>
+
+  <div class="card">
+    <h2>Source &amp; license</h2>
+    <p class="meta">Upstream: tickertape.in · Code + data: <a href="https://github.com/oriz-co/oriz-mmi-tickertape-mmi-api">github.com/oriz-co/oriz-mmi-tickertape-mmi-api</a> · MIT.</p>
+  </div>
+</main>
+
+<footer class="legal">
+  <p>Part of the <a href="https://oriz.in/">Oriz</a> family — a free family of static sites + APIs by Chirag Singhal. No ads, no tracking, MIT-licensed.</p>
+  <nav>
+    <a href="https://oriz.in/about">About</a>
+    <a href="https://oriz.in/contact">Contact</a>
+    <a href="https://oriz.in/privacy">Privacy</a>
+    <a href="https://oriz.in/terms">Terms</a>
+    <a href="https://oriz.in/refunds">Refunds</a>
+    <a href="https://oriz.in/disclaimer">Disclaimer</a>
+  </nav>
+  <p class="row2">© <span id="yr"></span> Oriz</p>
+</footer>
+
+<script>
+(async () => {
+  document.getElementById('yr').textContent = new Date().getFullYear();
+  // Copy button(s)
+  document.querySelectorAll('button.copy').forEach((b) => {
+    b.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(b.dataset.copy);
+        const t = b.textContent; b.textContent = 'Copied'; b.classList.add('ok');
+        setTimeout(() => { b.textContent = t; b.classList.remove('ok'); }, 1200);
+      } catch (e) { b.textContent = 'Copy failed'; }
+    });
+  });
+  // Live preview + schema
+  const previewEl = document.getElementById('preview');
+  const schemaEl = document.getElementById('schema');
+  const badge = document.getElementById('liveBadge');
+  try {
+    const r = await fetch('/data/latest.json', { cache: 'no-store' });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    badge.textContent = j.date || j.year || 'ok';
+    // Find first array-of-objects in the JSON for table preview
+    const findArr = (obj, path = []) => {
+      if (Array.isArray(obj) && obj.length && typeof obj[0] === 'object' && obj[0] !== null) return { path, arr: obj };
+      if (obj && typeof obj === 'object') {
+        for (const k of Object.keys(obj)) {
+          const found = findArr(obj[k], [...path, k]);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+    const hit = findArr(j);
+    if (hit && hit.arr.length) {
+      const rows = hit.arr.slice(0, 3);
+      const cols = Object.keys(rows[0]);
+      const html = '<p class="meta" style="margin:0 0 .5rem">First 3 of ' + hit.arr.length + ' rows from <code>' + hit.path.join('.') + '</code>:</p>' +
+        '<div style="overflow-x:auto"><table><thead><tr>' +
+        cols.map((c) => '<th>' + c + '</th>').join('') +
+        '</tr></thead><tbody>' +
+        rows.map((row) => '<tr>' + cols.map((c) => {
+          const v = row[c];
+          const s = v === null || v === undefined ? '—' : typeof v === 'object' ? JSON.stringify(v) : String(v);
+          return '<td>' + (s.length > 80 ? s.slice(0, 77) + '…' : s) + '</td>';
+        }).join('') + '</tr>').join('') +
+        '</tbody></table></div>';
+      previewEl.innerHTML = html;
+    } else {
+      // Scalar / nested-object payload — show top-level keys + values
+      const entries = Object.entries(j).slice(0, 12);
+      previewEl.innerHTML =
+        '<div style="overflow-x:auto"><table><thead><tr><th>key</th><th>value</th></tr></thead><tbody>' +
+        entries.map(([k, v]) => {
+          const s = v === null ? '—' : typeof v === 'object' ? JSON.stringify(v) : String(v);
+          return '<tr><td><code>' + k + '</code></td><td>' + (s.length > 200 ? s.slice(0, 197) + '…' : s) + '</td></tr>';
+        }).join('') + '</tbody></table></div>';
+    }
+    // Schema: top-level keys + inferred types
+    const schemaLines = Object.entries(j).map(([k, v]) => {
+      let t = v === null ? 'null' : Array.isArray(v) ? 'array<' + (v[0] ? (typeof v[0] === 'object' ? 'object' : typeof v[0]) : 'unknown') + '>' : typeof v;
+      return '  ' + k + ': ' + t + ',';
+    }).join('\n');
+    schemaEl.textContent = '{\n' + schemaLines + '\n}';
+  } catch (e) {
+    badge.textContent = 'error';
+    previewEl.innerHTML = '<p class="meta">Failed to load <code>/data/latest.json</code>: ' + e.message + '</p>';
+    schemaEl.textContent = '// schema unavailable';
+  }
+})();
+</script>
+</body>
+</html>
