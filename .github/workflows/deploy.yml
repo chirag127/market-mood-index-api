@@ -45,6 +45,9 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Allow pnpm lifecycle scripts (pnpm 11 security gate)
+        run: pnpm config set dangerouslyAllowAllBuilds true --location global
+
       - name: Build site from README + data/
         run: node template/bootstrap.mjs --src="${{ github.workspace }}/host" --dest="${{ github.workspace }}/dist"
 
